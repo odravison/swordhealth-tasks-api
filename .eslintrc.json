@@ -25,17 +25,13 @@
   ],
   "rules": {
     "no-underscore-dangle": "off",
-    "no-console": ["error", 
-      { 
-        "allow": 
-        ["warn", "error"] 
-      }
-    ],
-    "prettier/prettier": ["error",
+    "no-console": ["error",
       {
-        "endOfLine": "auto"
+        "allow":
+        ["warn", "error"]
       }
     ],
+    "prettier/prettier": "error",
     "class-methods-use-this": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
