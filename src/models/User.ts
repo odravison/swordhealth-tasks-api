@@ -1,13 +1,14 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
+import BasicEntity from './BasicEntity';
 import UserRole from './enums/UserRole';
 
 @Entity('users')
-class User extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id?: string;
-
+class User extends BasicEntity {
   @Column()
   name: string;
+
+  @Column()
+  lastName: string;
 
   @Column({
     type: 'enum',
