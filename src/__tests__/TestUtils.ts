@@ -1,50 +1,44 @@
-import { Connection, EntityMetadata, getConnection } from 'typeorm';
+import { Connection } from 'typeorm';
 import createConnection from '../database';
 import ConstUtils from './ConstUtils';
 
 export default class TestUtils {
-  connection: Connection;
+  public static connection: Connection;
 
-  async getDatabaseTestConnection(): Promise<Connection> {
-    if (!this.isTestConnectionCreated()) {
-      this.connection = await createConnection('test-connection');
+  static async getDatabaseTestConnection(): Promise<Connection> {
+    if (!TestUtils.isTestConnectionCreated()) {
+      TestUtils.connection = await createConnection();
     }
-    return this.connection;
+    return TestUtils.connection;
   }
 
-  async cleanUpTestDatabase(): Promise<void> {
-    const dbTestConnection: Connection = await this.getDatabaseTestConnection();
+  static async cleanUpTestDatabase(): Promise<void> {
+    const dbTestConnection: Connection =
+      await TestUtils.getDatabaseTestConnection();
 
     await dbTestConnection.query('SET FOREIGN_KEY_CHECKS = 0');
 
-    dbTestConnection.entityMetadatas.forEach(
-      async (entityMetadata: EntityMetadata) => {
-        await dbTestConnection.query(
-          `${ConstUtils.DELETE_FROM_STATEMENT}${entityMetadata.tableName}`,
-        );
-      },
-    );
+    await dbTestConnection.query(`${ConstUtils.DELETE_FROM_STATEMENT}users`);
+    await dbTestConnection.query(`${ConstUtils.DELETE_FROM_STATEMENT}tasks`);
 
     await dbTestConnection.query('SET FOREIGN_KEY_CHECKS = 1');
   }
 
-  async closeDatabaseConnections(): Promise<void> {
-    const mainConnection = getConnection();
-    (await this.getDatabaseTestConnection()).close();
-    await mainConnection.close();
+  static async closeDatabaseConnections(): Promise<void> {
+    const connection = await this.getDatabaseTestConnection();
+    connection.close();
   }
 
-  async clearDatabaseAndRunMigrations(): Promise<void> {
+  static async clearDatabaseAndRunMigrations(): Promise<void> {
     const dbTestConnection: Connection = await this.getDatabaseTestConnection();
 
     await dbTestConnection.query('SET FOREIGN_KEY_CHECKS = 0');
 
-    dbTestConnection.entityMetadatas.forEach(
-      async (entityMetadata: EntityMetadata) => {
-        await dbTestConnection.query(
-          `${ConstUtils.DROP_TABLE_IF_EXISTS_STATEMENT}${entityMetadata.tableName}`,
-        );
-      },
+    await dbTestConnection.query(
+      `${ConstUtils.DROP_TABLE_IF_EXISTS_STATEMENT}users`,
+    );
+    await dbTestConnection.query(
+      `${ConstUtils.DROP_TABLE_IF_EXISTS_STATEMENT}tasks`,
     );
 
     await dbTestConnection.query('DROP TABLE IF EXISTS migrations');
@@ -53,11 +47,11 @@ export default class TestUtils {
     await dbTestConnection.runMigrations();
   }
 
-  private isTestConnectionCreated(): boolean {
-    return this.connection !== undefined;
+  private static isTestConnectionCreated(): boolean {
+    return TestUtils.connection !== undefined;
   }
 
-  public generateString(length: number): string {
+  public static generateString(length: number): string {
     let result = '';
     const characters =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -8,7 +8,7 @@ import AppError from './errors/AppError';
 
 import createConnection from './database';
 
-createConnection();
+createConnection('application-connection');
 const app = express();
 
 app.use(express.json());

@@ -1,26 +1,27 @@
-import { Connection } from 'typeorm';
 import UserRole from '../../models/enums/UserRole';
 import User from '../../models/User';
-import UserService from '../../services/UserService';
+import CreateUserService from '../../services/user/CreateUserService';
+import FindUserService from '../../services/user/FindUserService';
+import RemoveUserService from '../../services/user/RemoveUserService';
+import UpdateUserService from '../../services/user/UpdateUserService';
 import TestUtils from '../TestUtils';
 
-let connection: Connection;
-const userService: UserService = new UserService();
-const utils: TestUtils = new TestUtils();
+const createUserService = new CreateUserService();
+const removeUserService = new RemoveUserService();
+const updateUserService = new UpdateUserService();
+const findUserService = new FindUserService();
 
 describe('UserService Tests', () => {
   beforeAll(async () => {
-    await utils.clearDatabaseAndRunMigrations();
-    connection = await utils.getDatabaseTestConnection();
-    User.useConnection(connection);
+    await TestUtils.clearDatabaseAndRunMigrations();
   });
 
   beforeEach(async () => {
-    await utils.cleanUpTestDatabase();
+    await TestUtils.cleanUpTestDatabase();
   });
 
   afterAll(async () => {
-    await utils.closeDatabaseConnections();
+    await TestUtils.closeDatabaseConnections();
   });
 
   it('should be able to persist an User correctly', async () => {
@@ -30,7 +31,7 @@ describe('UserService Tests', () => {
       role: UserRole.MANAGER,
     } as User;
 
-    const userPersisted = await userService.save(userToBePersisted);
+    const userPersisted = await createUserService.execute(userToBePersisted);
 
     expect(userPersisted.id).toBeDefined();
     expect(userPersisted.name).toBeDefined();
@@ -52,11 +53,15 @@ describe('UserService Tests', () => {
       role: UserRole.TECHNICIAN,
     } as User;
 
-    const userPersisted1 = await userService.save(userToBePersisted1);
-    const userPersisted2 = await userService.save(userToBePersisted2);
+    const userPersisted1 = await createUserService.execute(userToBePersisted1);
+    const userPersisted2 = await createUserService.execute(userToBePersisted2);
 
-    const userRemoved1 = await userService.remove(userPersisted1.id || '');
-    const userRemoved2 = await userService.remove(userPersisted2.id || '');
+    const userRemoved1 = await removeUserService.execute(
+      userPersisted1.id || '',
+    );
+    const userRemoved2 = await removeUserService.execute(
+      userPersisted2.id || '',
+    );
 
     expect(userRemoved1.id).toBeUndefined();
     expect(userRemoved2.id).toBeUndefined();
@@ -69,12 +74,12 @@ describe('UserService Tests', () => {
       role: UserRole.MANAGER,
     } as User;
 
-    const userPersisted = await userService.save(userToBePersisted);
+    const userPersisted = await createUserService.execute(userToBePersisted);
 
     userPersisted.name = 'Rui';
     userPersisted.lastName = 'Barros';
 
-    const userUpdated = await userService.update(userPersisted);
+    const userUpdated = await updateUserService.execute(userPersisted);
 
     expect(userUpdated.name).toEqual('Rui');
     expect(userUpdated.lastName).toEqual('Barros');
@@ -87,8 +92,8 @@ describe('UserService Tests', () => {
       role: UserRole.MANAGER,
     } as User;
 
-    const userPersisted = await userService.save(userToBePersisted);
-    const userRead = await userService.findById(userPersisted.id);
+    const userPersisted = await createUserService.execute(userToBePersisted);
+    const userRead = await findUserService.execute(userPersisted.id);
 
     expect(userRead).toBeDefined();
     expect(userRead?.name).toEqual('Rui');

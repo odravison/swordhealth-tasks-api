@@ -1,4 +1,4 @@
-[{
+{
   "name": "default",
   "type": "mysql",
   "host": "localhost",
@@ -13,21 +13,4 @@
     "migrationsDir": "./src/database/migrations",
     "entitiesDir": "./src/models/"
   }
-},
-{
-  "name": "test-connection",
-  "type": "mysql",
-  "host": "localhost",
-  "port": 3306,
-  "username": "taskmanager",
-  "password": "dGFza21hbmFnZXJwYXNzd29yZA==",
-  "database": "tasks_management_tests",
-  "entities": ["./src/models/*.ts"],
-  "migrations": ["./src/database/migrations/*.ts"],
-  "synchronize": false,
-  "cli": {
-    "migrationsDir": "./src/database/migrations",
-    "entitiesDir": "./src/models/"
-  }
 }
-]

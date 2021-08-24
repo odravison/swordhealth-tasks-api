@@ -1,54 +1,48 @@
-import { Connection } from 'typeorm';
 import UserRole from '../../models/enums/UserRole';
 import Task from '../../models/Task';
 import User from '../../models/User';
 import TaskService from '../../services/TaskService';
-import UserService from '../../services/UserService';
+import CreateUserService from '../../services/user/CreateUserService';
 import TestUtils from '../TestUtils';
 
-let connection: Connection;
-const taskService: TaskService = new TaskService();
-const userService: UserService = new UserService();
-const utils: TestUtils = new TestUtils();
+let taskService: TaskService;
+let createUserService: CreateUserService;
+let managerTestUser: User;
+let technicianUser: User;
 
 describe('TaskService Tests', () => {
   beforeAll(async () => {
-    await utils.clearDatabaseAndRunMigrations();
-    connection = await utils.getDatabaseTestConnection();
-    Task.useConnection(connection);
-    User.useConnection(connection);
+    await TestUtils.clearDatabaseAndRunMigrations();
+    taskService = new TaskService();
+    createUserService = new CreateUserService();
   });
 
   beforeEach(async () => {
-    await utils.cleanUpTestDatabase();
-    const managerTestUser: User = {
+    await TestUtils.cleanUpTestDatabase();
+    managerTestUser = {
       name: 'Silvia',
       lastName: 'Gomes',
       role: UserRole.MANAGER,
     } as User;
 
-    const technicianUser: User = {
+    technicianUser = {
       name: 'Rui',
       lastName: 'Barbosa',
       role: UserRole.TECHNICIAN,
     } as User;
 
-    await userService.save(managerTestUser);
-    await userService.save(technicianUser);
+    await createUserService.execute(managerTestUser);
+    await createUserService.execute(technicianUser);
   });
 
   afterAll(async () => {
-    await utils.closeDatabaseConnections();
+    await TestUtils.closeDatabaseConnections();
   });
 
   it('should be able to persist an Task correctly', async () => {
-    const technicianUsers = await User.find({
-      where: { role: UserRole.TECHNICIAN },
-    });
-    const technicianUser = technicianUsers.find(user => user);
     const taskToBePersisted: Task = {
       owner: technicianUser,
-      summary: utils.generateString(2500),
+      summary: TestUtils.generateString(2500),
     } as Task;
 
     const taskPersisted = await taskService.save(taskToBePersisted);
@@ -62,13 +56,9 @@ describe('TaskService Tests', () => {
   });
 
   it('should be able to delete an Task correctly', async () => {
-    const technicianUsers = await User.find({
-      where: { role: UserRole.TECHNICIAN },
-    });
-    const technicianUser = technicianUsers.find(user => user);
     const taskToBePersisted: Task = {
       owner: technicianUser,
-      summary: utils.generateString(2500),
+      summary: TestUtils.generateString(2500),
     } as Task;
 
     const taskPersisted = await taskService.save(taskToBePersisted);
@@ -79,18 +69,14 @@ describe('TaskService Tests', () => {
   });
 
   it('should be able to update an Task correctly', async () => {
-    const technicianUsers = await User.find({
-      where: { role: UserRole.TECHNICIAN },
-    });
-    const technicianUser = technicianUsers.find(user => user);
     const taskToBePersisted: Task = {
       owner: technicianUser,
-      summary: utils.generateString(2500),
+      summary: TestUtils.generateString(2500),
     } as Task;
 
     const taskPersisted = await taskService.save(taskToBePersisted);
 
-    const newTaskSummary = utils.generateString(500);
+    const newTaskSummary = TestUtils.generateString(500);
 
     taskPersisted.summary = newTaskSummary;
 
@@ -100,11 +86,7 @@ describe('TaskService Tests', () => {
   });
 
   it('should be able to read an Task correctly', async () => {
-    const technicianUsers = await User.find({
-      where: { role: UserRole.TECHNICIAN },
-    });
-    const technicianUser = technicianUsers.find(user => user);
-    const taskSummaryToBePersisted = utils.generateString(195);
+    const taskSummaryToBePersisted = TestUtils.generateString(195);
     const taskToBePersisted: Task = {
       owner: technicianUser,
       summary: taskSummaryToBePersisted,

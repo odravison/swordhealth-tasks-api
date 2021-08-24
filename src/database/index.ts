@@ -8,13 +8,13 @@ import {
 export default async (name = 'default'): Promise<Connection> => {
   const defaultOptions: ConnectionOptions = await getConnectionOptions();
 
-  return createConnection(
-    Object.assign(defaultOptions, {
-      name,
-      database:
-        process.env.NODE_ENV === 'test'
-          ? 'tasks_management_tests'
-          : defaultOptions.database,
-    }),
-  );
+  const connectionOptions: ConnectionOptions = Object.assign(defaultOptions, {
+    name,
+    database:
+      process.env.NODE_ENV === 'test'
+        ? 'tasks_management_tests'
+        : defaultOptions.database,
+  });
+
+  return createConnection(connectionOptions);
 };
