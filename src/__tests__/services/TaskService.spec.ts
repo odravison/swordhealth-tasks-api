@@ -5,19 +5,12 @@ import TaskService from '../../services/TaskService';
 import CreateUserService from '../../services/user/CreateUserService';
 import TestUtils from '../TestUtils';
 
-let taskService: TaskService;
-let createUserService: CreateUserService;
 let managerTestUser: User;
 let technicianUser: User;
 
 describe('TaskService Tests', () => {
-  beforeAll(async () => {
-    await TestUtils.clearDatabaseAndRunMigrations();
-    taskService = new TaskService();
-    createUserService = new CreateUserService();
-  });
-
   beforeEach(async () => {
+    const createUserService = new CreateUserService();
     await TestUtils.cleanUpTestDatabase();
     managerTestUser = {
       name: 'Silvia',
@@ -35,11 +28,8 @@ describe('TaskService Tests', () => {
     await createUserService.execute(technicianUser);
   });
 
-  afterAll(async () => {
-    await TestUtils.closeDatabaseConnections();
-  });
-
   it('should be able to persist an Task correctly', async () => {
+    const taskService = new TaskService();
     const taskToBePersisted: Task = {
       owner: technicianUser,
       summary: TestUtils.generateString(2500),
@@ -56,6 +46,7 @@ describe('TaskService Tests', () => {
   });
 
   it('should be able to delete an Task correctly', async () => {
+    const taskService = new TaskService();
     const taskToBePersisted: Task = {
       owner: technicianUser,
       summary: TestUtils.generateString(2500),
@@ -69,6 +60,7 @@ describe('TaskService Tests', () => {
   });
 
   it('should be able to update an Task correctly', async () => {
+    const taskService = new TaskService();
     const taskToBePersisted: Task = {
       owner: technicianUser,
       summary: TestUtils.generateString(2500),
@@ -86,6 +78,7 @@ describe('TaskService Tests', () => {
   });
 
   it('should be able to read an Task correctly', async () => {
+    const taskService = new TaskService();
     const taskSummaryToBePersisted = TestUtils.generateString(195);
     const taskToBePersisted: Task = {
       owner: technicianUser,
@@ -94,7 +87,7 @@ describe('TaskService Tests', () => {
 
     const taskPersisted = await taskService.save(taskToBePersisted);
 
-    const taskRead = await taskService.findById(taskPersisted.id);
+    const taskRead = await taskService.findById(taskPersisted.id as string);
 
     expect(taskRead).toBeDefined();
     expect(taskRead?.owner).toEqual(technicianUser);

@@ -25,12 +25,13 @@ export default class TestUtils {
   }
 
   static async closeDatabaseConnections(): Promise<void> {
-    const connection = await this.getDatabaseTestConnection();
-    connection.close();
+    const connection = await TestUtils.getDatabaseTestConnection();
+    await connection.close();
   }
 
   static async clearDatabaseAndRunMigrations(): Promise<void> {
-    const dbTestConnection: Connection = await this.getDatabaseTestConnection();
+    const dbTestConnection: Connection =
+      await TestUtils.getDatabaseTestConnection();
 
     await dbTestConnection.query('SET FOREIGN_KEY_CHECKS = 0');
 

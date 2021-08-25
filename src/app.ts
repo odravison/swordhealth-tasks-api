@@ -5,6 +5,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 
 import AppError from './errors/AppError';
+import routes from './routes';
+import checkAuthentication from './middleware/AuthenticationMiddleware';
 
 import createConnection from './database';
 
@@ -12,6 +14,8 @@ createConnection('application-connection');
 const app = express();
 
 app.use(express.json());
+app.use(checkAuthentication);
+app.use(routes);
 
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
   console.error(err);

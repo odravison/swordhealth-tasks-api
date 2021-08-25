@@ -5,9 +5,7 @@ import BasicEntity from '../models/BasicEntity';
 abstract class AbstractService<T extends BasicEntity> {
   abstract getRepository(): Repository<T>;
 
-  async findById(
-    id: string | number | Date | undefined,
-  ): Promise<T | undefined> {
+  async findById(id: string | number | Date | undefined): Promise<T> {
     if (id === undefined) {
       console.error('Find entity error. Id undefined');
       throw new AppError('Id cannot be undefined', 400);
@@ -19,6 +17,10 @@ abstract class AbstractService<T extends BasicEntity> {
     }
 
     return entityFound;
+  }
+
+  async findAll(): Promise<T[]> {
+    return this.getRepository().find();
   }
 
   async remove(id: string | number | Date | undefined): Promise<T> {

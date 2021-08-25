@@ -4,7 +4,6 @@ import CreateUserService from '../../services/user/CreateUserService';
 import FindUserService from '../../services/user/FindUserService';
 import RemoveUserService from '../../services/user/RemoveUserService';
 import UpdateUserService from '../../services/user/UpdateUserService';
-import TestUtils from '../TestUtils';
 
 const createUserService = new CreateUserService();
 const removeUserService = new RemoveUserService();
@@ -12,18 +11,6 @@ const updateUserService = new UpdateUserService();
 const findUserService = new FindUserService();
 
 describe('UserService Tests', () => {
-  beforeAll(async () => {
-    await TestUtils.clearDatabaseAndRunMigrations();
-  });
-
-  beforeEach(async () => {
-    await TestUtils.cleanUpTestDatabase();
-  });
-
-  afterAll(async () => {
-    await TestUtils.closeDatabaseConnections();
-  });
-
   it('should be able to persist an User correctly', async () => {
     const userToBePersisted: User = {
       name: 'Silvia',
